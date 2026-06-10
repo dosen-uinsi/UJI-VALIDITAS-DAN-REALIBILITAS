@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Aplikasi Interpretasi SPSS - 5 Item Soal</title>
+  <style>
+    :root{
+      --bg:#f4f7fb;--card:#ffffff;--text:#172033;--muted:#667085;--border:#d0d5dd;
+      --brand:#174a7c;--brand2:#0f766e;--ok:#027a48;--bad:#b42318;--warn:#b54708;
+      --okbg:#ecfdf3;--badbg:#fef3f2;--warnbg:#fffaeb;--bluebg:#eff8ff;
+      --shadow:0 10px 28px rgba(16,24,40,.08)
+    }
+    *{box-sizing:border-box}
+    body{margin:0;background:var(--bg);color:var(--text);font-family:Arial,Helvetica,sans-serif;line-height:1.5}
+    header{background:linear-gradient(135deg,var(--brand),var(--brand2));color:#fff;padding:28px 16px;text-align:center}
+    header h1{margin:0;font-size:clamp(1.35rem,3vw,2.2rem)}
+    header p{margin:8px auto 0;max-width:880px;opacity:.96}
+    main{max-width:1100px;margin:22px auto 50px;padding:0 14px}
+    .card{background:var(--card);border:1px solid var(--border);border-radius:18px;padding:18px;margin-bottom:16px;box-shadow:var(--shadow)}
+    h2{margin:0 0 12px;color:#12395f;border-left:6px solid var(--brand2);padding-left:10px}
+    label{display:block;font-weight:700;margin:10px 0 6px}
+    textarea,input,button{font:inherit}
+    textarea,input{width:100%;border:1px solid var(--border);border-radius:12px;padding:10px 12px;background:#fff;color:var(--text)}
+    textarea{min-height:150px;resize:vertical}
+    .tiny{font-size:.9rem;color:var(--muted)}
+    .grid{display:grid;grid-template-columns:repeat(12,1fr);gap:16px}.span12{grid-column:span 12}.span6{grid-column:span 12}.span4{grid-column:span 12}.span8{grid-column:span 12}
+    @media(min-width:900px){.span6{grid-column:span 6}.span4{grid-column:span 4}.span8{grid-column:span 8}}
+    .toolbar{display:flex;gap:10px;flex-wrap:wrap;margin-top:12px}.btn{border:0;border-radius:12px;padding:10px 14px;font-weight:700;cursor:pointer;background:#e4e7ec;color:#101828}.btn:hover{filter:brightness(.97)}.primary{background:var(--brand);color:#fff}.green{background:var(--brand2);color:#fff}.danger{background:#f04438;color:#fff}.ghost{background:#fff;border:1px solid var(--border)}
+    table{width:100%;border-collapse:collapse;margin-top:10px;background:#fff;border-radius:14px;overflow:hidden}th,td{border:1px solid var(--border);padding:9px 10px;text-align:left;vertical-align:middle}th{background:#f2f4f7;color:#344054}.tablewrap{overflow:auto}
+    .manual-table input{text-align:center}.valid{background:#f6fef9}.invalid{background:#fff5f5}.unknown{background:#fffcf5}
+    .badge{display:inline-block;border-radius:999px;padding:4px 9px;font-weight:700;font-size:.86rem}.badge-valid{background:#d1fadf;color:#05603a}.badge-invalid{background:#fee4e2;color:#912018}.badge-warn{background:#fef0c7;color:#93370d}.badge-blue{background:#d1e9ff;color:#175cd3}
+    .alert{border-radius:14px;padding:13px 14px;margin-top:12px;border:1px solid}.alert.success{background:var(--okbg);border-color:#abefc6}.alert.danger{background:var(--badbg);border-color:#fecdca}.alert.warn{background:var(--warnbg);border-color:#fedf89}.alert.blue{background:var(--bluebg);border-color:#b2ddff}
+    .summary{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}.metric{border:1px solid var(--border);border-radius:14px;padding:14px;background:#fff}.metric .num{font-size:1.7rem;font-weight:800}.metric .label{color:var(--muted);font-size:.92rem}.metric.success{background:var(--okbg);border-color:#abefc6}.metric.danger{background:var(--badbg);border-color:#fecdca}.metric.warn{background:var(--warnbg);border-color:#fedf89}.metric.blue{background:var(--bluebg);border-color:#b2ddff}
+    @media(max-width:800px){.summary{grid-template-columns:repeat(2,1fr)}}@media(max-width:520px){.summary{grid-template-columns:1fr}}
+    details{border:1px dashed var(--border);border-radius:14px;padding:12px;background:#fff}summary{font-weight:800;cursor:pointer;color:#12395f}
+    .printbar{position:sticky;bottom:0;background:rgba(244,247,251,.95);backdrop-filter:blur(6px);border-top:1px solid var(--border);padding:10px 0;margin-top:16px}
+    @media print{header,.toolbar,.printbar,details,.no-print{display:none!important}main{margin:0;padding:0}.card{box-shadow:none;border:0;break-inside:avoid}body{background:#fff}}
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Aplikasi Interpretasi Output SPSS</h1>
+    <p><b>Khusus 5 item soal.</b> Masukkan nilai Pearson Correlation dan Sig. 2-tailed dari output SPSS, lalu aplikasi langsung membuat interpretasi validitas dan reliabilitas.</p>
+  </header>
+
+  <main>
+    <section class="card">
+      <h2>Input Utama: 5 Item Soal</h2>
+      <p class="tiny">Isi nilai dari output SPSS pada baris <b>Total Pearson Correlation</b> dan <b>Sig. (2-tailed)</b>. Boleh memakai tanda koma atau titik, misalnya 0,642 atau 0.642.</p>
+      <div class="tablewrap">
+        <table class="manual-table" id="inputTable">
+          <thead>
+            <tr>
+              <th style="width:80px">No.</th>
+              <th>Item Soal</th>
+              <th>Nilai r / Pearson Correlation</th>
+              <th>Sig. 2-tailed</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td>1</td><td><input id="item1" value="Item 1"></td><td><input id="r1" placeholder="contoh: 0.241"></td><td><input id="sig1" placeholder="contoh: 0.503"></td></tr>
+            <tr><td>2</td><td><input id="item2" value="Item 2"></td><td><input id="r2" placeholder="contoh: 0.642"></td><td><input id="sig2" placeholder="contoh: 0.045"></td></tr>
+            <tr><td>3</td><td><input id="item3" value="Item 3"></td><td><input id="r3" placeholder="contoh: 0.888"></td><td><input id="sig3" placeholder="contoh: 0.001"></td></tr>
+            <tr><td>4</td><td><input id="item4" value="Item 4"></td><td><input id="r4" placeholder="contoh: 0.758"></td><td><input id="sig4" placeholder="contoh: 0.011"></td></tr>
+            <tr><td>5</td><td><input id="item5" value="Item 5"></td><td><input id="r5" placeholder="contoh: 0.839"></td><td><input id="sig5" placeholder="contoh: 0.002"></td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="grid" style="margin-top:12px">
+        <div class="span4">
+          <label for="alphaInput">Cronbach's Alpha</label>
+          <input id="alphaInput" placeholder="contoh: 0.807">
+        </div>
+        <div class="span4">
+          <label for="sigCut">Batas Sig.</label>
+          <input id="sigCut" value="0.05">
+        </div>
+        <div class="span4">
+          <label for="alphaCut">Batas Reliabilitas Alpha</label>
+          <input id="alphaCut" value="0.6">
+        </div>
+      </div>
+
+      <div class="toolbar">
+        <button class="btn primary" onclick="analyzeManual()">Analisis 5 Item</button>
+        <button class="btn green" onclick="copyNarrative()">Salin Narasi</button>
+        <button class="btn ghost" onclick="fillExample()">Isi Contoh 5 Item</button>
+        <button class="btn ghost" onclick="window.print()">Cetak / Simpan PDF</button>
+        <button class="btn danger" onclick="clearAll()">Bersihkan</button>
+      </div>
+    </section>
+
+    <details class="card no-print">
+      <summary>Opsional: paste output SPSS lalu ambil otomatis 5 item pertama</summary>
+      <label for="rawOutput">Paste output SPSS di sini</label>
+      <textarea id="rawOutput" placeholder="Tempel tabel Correlations dan Reliability Statistics dari SPSS. Aplikasi hanya mengambil 5 item pertama."></textarea>
+      <div class="toolbar">
+        <button class="btn primary" onclick="detectFromSPSS()">Ambil dari Output SPSS</button>
+        <button class="btn ghost" onclick="pasteClipboard()">Paste dari Clipboard</button>
+      </div>
+      <p class="tiny" id="detectStatus">Catatan: jika output berisi lebih dari 5 item, aplikasi hanya mengambil 5 item pertama.</p>
+    </details>
+
+    <section class="card">
+      <h2>Ringkasan Hasil</h2>
+      <div id="summaryBox" class="summary">
+        <div class="metric blue"><div class="num">-</div><div class="label">Item diisi</div></div>
+        <div class="metric success"><div class="num">-</div><div class="label">Valid</div></div>
+        <div class="metric danger"><div class="num">-</div><div class="label">Tidak valid</div></div>
+        <div class="metric warn"><div class="num">-</div><div class="label">Reliabilitas</div></div>
+      </div>
+      <div id="quickConclusion" class="alert blue">Hasil interpretasi akan muncul setelah tombol <b>Analisis 5 Item</b> diklik.</div>
+    </section>
+
+    <section class="card">
+      <h2>Hasil Uji Validitas</h2>
+      <div id="validityResult"><p class="tiny">Belum ada hasil. Silakan isi 5 item soal lalu klik Analisis.</p></div>
+    </section>
+
+    <section class="card">
+      <h2>Hasil Uji Reliabilitas</h2>
+      <div id="reliabilityResult"><p class="tiny">Belum ada hasil. Isi nilai Cronbach's Alpha jika tersedia.</p></div>
+    </section>
+
+    <section class="card">
+      <h2>Narasi Siap Tempel ke Laporan</h2>
+      <textarea id="narrative" readonly placeholder="Narasi interpretasi otomatis akan muncul di sini."></textarea>
+      <div class="toolbar">
+        <button class="btn green" onclick="copyNarrative()">Salin Narasi</button>
+        <button class="btn ghost" onclick="window.print()">Cetak / Simpan PDF</button>
+      </div>
+    </section>
+
+    <div class="printbar no-print">
+      <div class="toolbar" style="max-width:1100px;margin:auto;padding:0 14px">
+        <button class="btn primary" onclick="analyzeManual()">Analisis 5 Item</button>
+        <button class="btn green" onclick="copyNarrative()">Salin Narasi</button>
+        <button class="btn ghost" onclick="window.print()">Cetak / Simpan PDF</button>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    const $ = id => document.getElementById(id);
+    let latestRows = [];
+    let latestAlpha = NaN;
+
+    function parseNumber(value){
+      if(value === null || value === undefined) return NaN;
+      let s = String(value).trim();
+      if(!s) return NaN;
+      s = s.replace(/\*/g,'').replace(/,/g,'.').replace(/≤/g,'<=').replace(/≥/g,'>=').replace(/\s+/g,'');
+      s = s.replace(/[a-zA-Z]/g,'');
+      const less = s.startsWith('<');
+      s = s.replace(/^[<>]=?/,'');
+      if(s.startsWith('.')) s = '0' + s;
+      if(s.startsWith('-.')) s = s.replace('-.','-0.');
+      const n = Number(s);
+      if(!isFinite(n)) return NaN;
+      return less && n === 0 ? 0 : n;
+    }
+    function extractNumbers(line){
+      const matches = String(line).match(/[<>≤≥]?\s*-?(?:\d+[\.,]?\d*|[\.,]\d+)/g) || [];
+      return matches.map(parseNumber).filter(n => isFinite(n));
+    }
+    function fmt(n, d=3){
+      if(!isFinite(n)) return '-';
+      return Number(n).toFixed(d).replace(/\.0+$/,'').replace(/(\.\d*?)0+$/,'$1');
+    }
+    function esc(str){
+      return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#039;');
+    }
+    function settings(){
+      return { sigCut: parseNumber($('sigCut').value) || 0.05, alphaCut: parseNumber($('alphaCut').value) || 0.6 };
+    }
+    function classify(row){
+      const {sigCut} = settings();
+      if(!isFinite(row.r) || !isFinite(row.sig)) return {status:'Belum lengkap', cls:'unknown', badge:'badge-warn', reason:'Nilai r atau Sig. belum diisi lengkap.'};
+      if(row.r <= 0) return {status:'Tidak valid', cls:'invalid', badge:'badge-invalid', reason:'Nilai korelasi tidak positif.'};
+      if(row.sig <= sigCut) return {status:'Valid', cls:'valid', badge:'badge-valid', reason:`r positif dan Sig. ≤ ${fmt(sigCut,3)}.`};
+      return {status:'Tidak valid', cls:'invalid', badge:'badge-invalid', reason:`Sig. > ${fmt(sigCut,3)}.`};
+    }
+    function readFiveRows(){
+      const rows = [];
+      for(let i=1;i<=5;i++){
+        rows.push({
+          item: $('item'+i).value.trim() || `Item ${i}`,
+          r: parseNumber($('r'+i).value),
+          sig: parseNumber($('sig'+i).value)
+        });
+      }
+      return rows;
+    }
+    function analyzeManual(){
+      latestRows = readFiveRows();
+      latestAlpha = parseNumber($('alphaInput').value);
+      renderAll();
+    }
+    function renderAll(){
+      renderSummary();
+      renderValidity();
+      renderReliability();
+      buildNarrative();
+    }
+    function renderSummary(){
+      const filled = latestRows.filter(r => isFinite(r.r) || isFinite(r.sig)).length;
+      const valid = latestRows.filter(r => classify(r).status === 'Valid').length;
+      const invalid = latestRows.filter(r => classify(r).status === 'Tidak valid').length;
+      const alphaKnown = isFinite(latestAlpha);
+      const reliable = alphaKnown && latestAlpha > settings().alphaCut;
+      $('summaryBox').innerHTML = `
+        <div class="metric blue"><div class="num">${filled || '-'}</div><div class="label">Item diisi dari 5</div></div>
+        <div class="metric success"><div class="num">${filled ? valid : '-'}</div><div class="label">Valid</div></div>
+        <div class="metric danger"><div class="num">${filled ? invalid : '-'}</div><div class="label">Tidak valid</div></div>
+        <div class="metric ${alphaKnown ? (reliable ? 'success':'danger') : 'warn'}"><div class="num">${alphaKnown ? fmt(latestAlpha) : '-'}</div><div class="label">${alphaKnown ? (reliable ? 'Reliabel':'Tidak reliabel') : 'Reliabilitas'}</div></div>`;
+      const invalidItems = latestRows.filter(r => classify(r).status === 'Tidak valid').map(r => r.item);
+      let msg = filled ? (invalidItems.length ? `Validitas: ${invalidItems.length} item tidak valid, yaitu ${invalidItems.join(', ')}.` : 'Validitas: item yang diisi dinyatakan valid.') : 'Validitas: data belum diisi.';
+      if(alphaKnown) msg += reliable ? ` Reliabilitas: Alpha ${fmt(latestAlpha)} > ${fmt(settings().alphaCut,2)}, sehingga reliabel.` : ` Reliabilitas: Alpha ${fmt(latestAlpha)} ≤ ${fmt(settings().alphaCut,2)}, sehingga tidak reliabel.`;
+      else msg += ' Reliabilitas: nilai Cronbach\'s Alpha belum diisi.';
+      $('quickConclusion').className = 'alert ' + (invalidItems.length || (alphaKnown && !reliable) ? 'danger' : (filled || alphaKnown ? 'success' : 'blue'));
+      $('quickConclusion').textContent = msg;
+    }
+    function renderValidity(){
+      const {sigCut} = settings();
+      let html = `<p><b>Kriteria:</b> item valid apabila nilai korelasi Pearson bernilai positif dan Sig. 2-tailed ≤ ${fmt(sigCut,3)}.</p>`;
+      html += '<div class="tablewrap"><table><thead><tr><th>No.</th><th>Item</th><th>Nilai r</th><th>Sig. 2-tailed</th><th>Keputusan</th><th>Alasan</th></tr></thead><tbody>';
+      latestRows.forEach((row, idx)=>{
+        const c = classify(row);
+        html += `<tr class="${c.cls}"><td>${idx+1}</td><td>${esc(row.item)}</td><td>${fmt(row.r)}</td><td>${fmt(row.sig)}</td><td><span class="badge ${c.badge}">${c.status}</span></td><td>${c.reason}</td></tr>`;
+      });
+      html += '</tbody></table></div>';
+      const invalid = latestRows.filter(r => classify(r).status === 'Tidak valid').map(r => r.item);
+      const valid = latestRows.filter(r => classify(r).status === 'Valid').map(r => r.item);
+      const unknown = latestRows.filter(r => classify(r).status === 'Belum lengkap').length;
+      if(invalid.length) html += `<div class="alert danger"><b>Kesimpulan:</b> item tidak valid adalah ${invalid.join(', ')}. Item tersebut sebaiknya dikeluarkan/dibuang. Item yang dapat dipakai adalah ${valid.length ? valid.join(', ') : '-'}.</div>`;
+      else if(unknown) html += `<div class="alert warn"><b>Kesimpulan sementara:</b> ada ${unknown} item yang belum lengkap, sehingga belum bisa diputuskan.</div>`;
+      else html += '<div class="alert success"><b>Kesimpulan:</b> kelima item soal dinyatakan valid dan dapat dilanjutkan ke uji reliabilitas.</div>';
+      $('validityResult').innerHTML = html;
+    }
+    function renderReliability(){
+      const {alphaCut} = settings();
+      if(!isFinite(latestAlpha)){
+        $('reliabilityResult').innerHTML = '<div class="alert warn"><b>Nilai Cronbach\'s Alpha belum diisi.</b> Isi nilai Alpha dari output SPSS jika ingin menampilkan interpretasi reliabilitas.</div>';
+        return;
+      }
+      const reliable = latestAlpha > alphaCut;
+      $('reliabilityResult').innerHTML = `
+        <p><b>Kriteria:</b> instrumen reliabel jika Cronbach's Alpha &gt; ${fmt(alphaCut,2)}.</p>
+        <table><thead><tr><th>Cronbach's Alpha</th><th>Perbandingan</th><th>Keputusan</th></tr></thead><tbody>
+          <tr class="${reliable ? 'valid':'invalid'}"><td>${fmt(latestAlpha)}</td><td>${fmt(latestAlpha)} ${reliable ? '&gt;' : '≤'} ${fmt(alphaCut,2)}</td><td><span class="badge ${reliable ? 'badge-valid':'badge-invalid'}">${reliable ? 'Reliabel':'Tidak reliabel'}</span></td></tr>
+        </tbody></table>
+        <div class="alert ${reliable ? 'success':'danger'}"><b>Kesimpulan:</b> nilai Cronbach's Alpha sebesar ${fmt(latestAlpha)} ${reliable ? 'lebih besar dari' : 'tidak lebih besar dari'} ${fmt(alphaCut,2)}, sehingga instrumen ${reliable ? 'dinyatakan reliabel.' : 'belum reliabel dan perlu diperbaiki.'}</div>`;
+    }
+    function buildNarrative(){
+      const {sigCut, alphaCut} = settings();
+      const complete = latestRows.filter(r => isFinite(r.r) && isFinite(r.sig));
+      const valid = latestRows.filter(r => classify(r).status === 'Valid').map(r => r.item);
+      const invalid = latestRows.filter(r => classify(r).status === 'Tidak valid').map(r => r.item);
+      const parts = [];
+      if(complete.length){
+        parts.push(`Berdasarkan hasil uji validitas terhadap 5 item soal menggunakan korelasi Pearson item-total dengan taraf signifikansi ${fmt(sigCut,3)}, item dinyatakan valid apabila nilai korelasi positif dan nilai Sig. 2-tailed ≤ ${fmt(sigCut,3)}. Hasil analisis menunjukkan bahwa ${valid.length ? valid.join(', ') : 'tidak ada item'} dinyatakan valid${invalid.length ? `, sedangkan ${invalid.join(', ')} dinyatakan tidak valid. Item yang tidak valid sebaiknya dikeluarkan/dibuang sebelum instrumen digunakan atau dilanjutkan pada uji reliabilitas.` : `. Dengan demikian, kelima item soal dinyatakan valid.`}`);
+      }
+      if(isFinite(latestAlpha)){
+        const reliable = latestAlpha > alphaCut;
+        parts.push(`Berdasarkan hasil uji reliabilitas, diperoleh nilai Cronbach's Alpha sebesar ${fmt(latestAlpha)}. Karena nilai tersebut ${reliable ? 'lebih besar dari' : 'tidak lebih besar dari'} ${fmt(alphaCut,2)}, maka instrumen ${reliable ? 'dinyatakan reliabel atau memiliki tingkat keterpercayaan yang baik.' : 'dinyatakan belum reliabel sehingga perlu dilakukan perbaikan instrumen.'}`);
+      }
+      $('narrative').value = parts.join('\n\n');
+    }
+    function fillExample(){
+      const rs = [0.241,0.642,0.888,0.758,0.839];
+      const ss = [0.503,0.045,0.001,0.011,0.002];
+      for(let i=1;i<=5;i++){$('item'+i).value = `Item ${i}`;$('r'+i).value = rs[i-1];$('sig'+i).value = ss[i-1];}
+      $('alphaInput').value = '0.807';
+      analyzeManual();
+    }
+    function clearAll(){
+      for(let i=1;i<=5;i++){$('item'+i).value = `Item ${i}`;$('r'+i).value = '';$('sig'+i).value = '';}
+      $('alphaInput').value = '';$('rawOutput').value = '';$('narrative').value = '';
+      latestRows = []; latestAlpha = NaN;
+      $('validityResult').innerHTML = '<p class="tiny">Belum ada hasil. Silakan isi 5 item soal lalu klik Analisis.</p>';
+      $('reliabilityResult').innerHTML = '<p class="tiny">Belum ada hasil. Isi nilai Cronbach\'s Alpha jika tersedia.</p>';
+      $('quickConclusion').className = 'alert blue';$('quickConclusion').innerHTML = 'Hasil interpretasi akan muncul setelah tombol <b>Analisis 5 Item</b> diklik.';
+      $('summaryBox').innerHTML = '<div class="metric blue"><div class="num">-</div><div class="label">Item diisi</div></div><div class="metric success"><div class="num">-</div><div class="label">Valid</div></div><div class="metric danger"><div class="num">-</div><div class="label">Tidak valid</div></div><div class="metric warn"><div class="num">-</div><div class="label">Reliabilitas</div></div>';
+      $('detectStatus').textContent = 'Catatan: jika output berisi lebih dari 5 item, aplikasi hanya mengambil 5 item pertama.';
+    }
+    function copyNarrative(){
+      const text = $('narrative').value || $('quickConclusion').textContent;
+      if(!text.trim()){ alert('Belum ada narasi yang bisa disalin.'); return; }
+      navigator.clipboard.writeText(text).then(()=>alert('Narasi berhasil disalin.')).catch(()=>alert('Gagal menyalin otomatis. Silakan salin manual.'));
+    }
+    function uniqueItems(text){
+      const found = [];
+      const seen = new Set();
+      const re = /\b(?:Item|Butir|Soal)\s*\d+\b|\bi\d+\b/gi;
+      let m;
+      while((m = re.exec(text)) && found.length < 5){
+        let label = m[0].replace(/\s+/g,' ').trim();
+        if(/^i\d+$/i.test(label)) label = 'Item ' + label.replace(/i/i,'');
+        label = label.replace(/\bitem\b/i,'Item').replace(/\bbutir\b/i,'Butir').replace(/\bsoal\b/i,'Soal');
+        const key = label.toLowerCase();
+        if(!seen.has(key)){ seen.add(key); found.push(label); }
+      }
+      while(found.length < 5) found.push(`Item ${found.length+1}`);
+      return found.slice(0,5);
+    }
+    function parseRowsFromSPSS(text){
+      const clean = String(text).replace(/\t/g,' ').replace(/\u00a0/g,' ');
+      const lines = clean.split(/\r?\n/).map(l => l.replace(/\s+/g,' ').trim()).filter(Boolean);
+      const labels = uniqueItems(clean);
+      for(let i=0;i<lines.length;i++){
+        const line = lines[i];
+        const prev = lines[i-1] || '';
+        if(/Pearson\s+Correlation/i.test(line) && /\b(Total|Ttl)\b/i.test(line + ' ' + prev)){
+          let rVals = extractNumbers(line.split(/Pearson\s+Correlation/i).pop()).slice(0,5);
+          if(rVals.length < 5 && lines[i+1]) rVals = rVals.concat(extractNumbers(lines[i+1])).slice(0,5);
+          let sigVals = [];
+          for(let j=i+1;j<Math.min(lines.length,i+8);j++){
+            if(/Sig\.?\s*\(?2[- ]?tailed\)?|Sig\./i.test(lines[j])){
+              sigVals = extractNumbers(lines[j].replace(/Sig\.?\s*\(?2[- ]?tailed\)?/i,'')).slice(0,5);
+              break;
+            }
+          }
+          if(rVals.length || sigVals.length) return labels.map((item,k)=>({item,r:rVals[k],sig:sigVals[k]}));
+        }
+      }
+      // fallback: lines like "Item 1 0.241 0.503"
+      const rows = [];
+      for(const line of lines){
+        const m = line.match(/\b((?:Item|Butir|Soal)\s*\d+|i\d+)\b/i);
+        if(!m) continue;
+        const nums = extractNumbers(line.slice(m.index + m[0].length));
+        if(nums.length >= 2){
+          let item = m[1].replace(/\s+/g,' ');
+          if(/^i\d+$/i.test(item)) item = 'Item ' + item.replace(/i/i,'');
+          rows.push({item,r:nums[0],sig:nums[1]});
+        }
+        if(rows.length === 5) break;
+      }
+      while(rows.length < 5) rows.push({item:`Item ${rows.length+1}`,r:NaN,sig:NaN});
+      return rows.slice(0,5);
+    }
+    function parseAlphaFromSPSS(text){
+      const manual = parseNumber($('alphaInput').value);
+      if(isFinite(manual)) return manual;
+      const raw = String(text);
+      const block = raw.match(/Reliability\s+Statistics([\s\S]{0,700})/i);
+      if(block){
+        const nums = extractNumbers(block[1]).filter(n => n >= 0 && n <= 1);
+        if(nums.length) return nums[0];
+      }
+      const lines = raw.split(/\r?\n/).map(l => l.trim()).filter(Boolean);
+      for(let i=0;i<lines.length;i++){
+        if(/Cronbach/i.test(lines[i]) && /Alpha/i.test(lines[i]) && !/deleted/i.test(lines[i])){
+          const nums = extractNumbers(lines.slice(i, i+4).join(' ')).filter(n => n >= 0 && n <= 1);
+          if(nums.length) return nums[0];
+        }
+      }
+      return NaN;
+    }
+    function detectFromSPSS(){
+      const text = $('rawOutput').value;
+      const rows = parseRowsFromSPSS(text);
+      rows.forEach((row,i)=>{
+        const n = i+1;
+        $('item'+n).value = row.item || `Item ${n}`;
+        $('r'+n).value = isFinite(row.r) ? fmt(row.r) : '';
+        $('sig'+n).value = isFinite(row.sig) ? fmt(row.sig) : '';
+      });
+      const alpha = parseAlphaFromSPSS(text);
+      if(isFinite(alpha)) $('alphaInput').value = fmt(alpha);
+      $('detectStatus').textContent = 'Output SPSS sudah dicoba dibaca. Silakan cek kembali angka pada 5 baris input utama, lalu hasil interpretasi telah diperbarui.';
+      analyzeManual();
+    }
+    async function pasteClipboard(){
+      try{
+        $('rawOutput').value = await navigator.clipboard.readText();
+        detectFromSPSS();
+      }catch(e){ alert('Browser belum mengizinkan paste otomatis. Silakan tekan Ctrl+V di kotak output SPSS.'); }
+    }
+    // update ringan saat pengguna mengetik
+    ['alphaInput','sigCut','alphaCut','r1','r2','r3','r4','r5','sig1','sig2','sig3','sig4','sig5','item1','item2','item3','item4','item5'].forEach(id=>{
+      $(id).addEventListener('input',()=>{ latestRows = readFiveRows(); latestAlpha = parseNumber($('alphaInput').value); renderAll(); });
+    });
+  </script>
+</body>
+</html>
